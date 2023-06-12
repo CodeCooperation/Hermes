@@ -1,0 +1,94 @@
+{
+  "name": "hermes",
+  "version": "0.5.2",
+  "description": "Automatically generate unit tests or review your code using openai chatgpt",
+  "main": "lib/index.js",
+  "type": "module",
+  "source": "./src/index.ts",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/index.js",
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup && cpy prompt build",
+    "clean": "del build",
+    "prebuild": "run-s clean",
+    "predev": "run-s clean && cpy prompt build",
+    "pretest": "run-s build",
+    "pre-commit": "lint-staged",
+    "prepare": "husky install",
+    "prepublishOnly": "run-s test",
+    "prettier": "prettier --write ./src",
+    "test": "jest --watch"
+  },
+  "files": [
+    "build",
+    "bin"
+  ],
+  "bin": {
+    "hermes": "./bin/cli.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.21.3",
+    "@babel/parser": "^7.21.3",
+    "@babel/traverse": "^7.21.3",
+    "abort-controller": "^3.0.0",
+    "chalk": "^5.2.0",
+    "chatgpt": "^5.1.4",
+    "commander": "^10.0.0",
+    "dotenv": "^16.0.3",
+    "inquirer": "^9.1.5",
+    "isomorphic-fetch": "^3.0.0",
+    "ora": "^5.4.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "openai",
+    "chatgpt",
+    "chat",
+    "gpt",
+    "gpt-3",
+    "gpt3",
+    "gpt4",
+    "conversation",
+    "conversational ai",
+    "ai",
+    "test",
+    "auto",
+    "generate",
+    "gen",
+    "jest",
+    "unit test",
+    "code review"
+  ],
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.10",
+    "cpy-cli": "^4.2.0",
+    "del-cli": "^5.0.0",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^13.2.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.7",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.3"
+  }
+}
