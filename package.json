@@ -1,7 +1,7 @@
 {
   "name": "hermes",
-  "version": "0.5.2",
-  "description": "Automatically generate unit tests or review your code using openai chatgpt",
+  "version": "1.0.0",
+  "description": "",
   "main": "lib/index.js",
   "type": "module",
   "source": "./src/index.ts",
@@ -55,21 +55,11 @@
     ]
   },
   "keywords": [
-    "openai",
-    "chatgpt",
-    "chat",
-    "gpt",
-    "gpt-3",
-    "gpt3",
-    "gpt4",
-    "conversation",
-    "conversational ai",
     "ai",
     "test",
     "auto",
     "generate",
     "gen",
-    "jest",
     "unit test",
     "code review"
   ],
