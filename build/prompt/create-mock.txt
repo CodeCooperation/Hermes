@@ -1,0 +1,28 @@
+
+Here is a simple example of how to write a "mock":
+import { Request, Response } from 'express';
+
+{{here are mock logic functions}}
+
+{{here are mock api responses}}
+export default {
+  {{#if Complexity case by user requirements}}
+  'GET {{api pathname}}': (req: Request, res: Response) => {
+    if ({{logic condition}}) {
+      return res.status(401).send({{response json}});
+    }
+
+    return res.send({{response json}});
+  },
+  // Simple case by user requirements
+  'GET {{api pathname}}': {{response json, or mock logic function}},
+};
+
+Please note that you need send response json by following structure, the "data" field type T I will provide later:
+interface ResponseStructure<T = any> {
+  success: boolean;
+  data: T;
+  errorCode?: number;
+  errorMessage?: string;
+  showType?: ErrorShowType;
+}
