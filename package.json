@@ -1,6 +1,6 @@
 {
   "name": "hermes",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "lib/index.js",
   "type": "module",
@@ -57,11 +57,10 @@
   "keywords": [
     "ai",
     "test",
-    "auto",
     "generate",
-    "gen",
     "unit test",
-    "code review"
+    "code review",
+    "bug fix"
   ],
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",

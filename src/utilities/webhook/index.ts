@@ -1,8 +1,16 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { codeBlocksRegex, reviewFileName, userOptions } from 'src/constant';
-import { deleteFileSync, getUserEmail, simplyReviewData } from 'src/utils';
+import {
+  codeBlocksRegex,
+  reviewFileName,
+  userOptions,
+} from 'src/utilities/constant';
+import {
+  deleteFileSync,
+  getUserEmail,
+  simplyReviewData,
+} from 'src/utilities/helpers';
 
 import { INoticeTask, ISeatalkNoticeOptions } from './constant';
 

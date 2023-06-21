@@ -1,11 +1,8 @@
-import { IReadFileResult } from 'src/types';
-import WebhookNotifier from 'src/webhook';
+import { IReadFileResult } from 'src/utilities/types';
+import WebhookNotifier from 'src/utilities/webhook';
 
 import HermesBase from './base';
 
-/**
- * Review code for a given file path
- */
 class HermesReview extends HermesBase {
   private publishChannel: WebhookNotifier;
 
@@ -14,9 +11,6 @@ class HermesReview extends HermesBase {
     this.publishChannel = new WebhookNotifier();
   }
 
-  /**
-   * Write a test message to a file
-   */
   private async postAIMessage(
     filePath: string,
     message: string,
@@ -24,11 +18,7 @@ class HermesReview extends HermesBase {
     this.publishChannel.addNoticeTask({ filePath, message });
   }
 
-  /**
-   * Generate a test case for a given file
-   */
   public async run(fileResult: IReadFileResult): Promise<string> {
-    // Reset the parent message to avoid the message tokens over limit
     this.openai.resetParentMessage();
     const message = await this.openai.run(fileResult);
     if (!message?.length) return;
@@ -38,9 +28,6 @@ class HermesReview extends HermesBase {
     return resMessage;
   }
 
-  /**
-   * Publish the notices to the webhook channel
-   */
   public publishNotice(): void {
     this.publishChannel.publishNotice();
   }

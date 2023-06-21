@@ -16,23 +16,8 @@ yarn add file:./tooling/hermes --dev
 ```
 
 ## Configuration
-### OpenAI Key (Choose one)
-- Set the [OpenAI API Key](https://platform.openai.com/account/api-keys) by npm config set -g
-    ```
-    npm config set OPENAI_API_KEY <YOUR_OPENAI_KEY> -g
-    ```
-- Set the `OpenAI Session Token` for free using chatgpt
-    - OpenAI session token, 2 setp to get token
-    - If you don't set this, will use OPENAI_API_KEY
-    1. visit https://chat.openai.com/chat and login
-    2. Visit https://chat.openai.com/api/auth/session to get token
-    ```bash
-    npm config set OPENAI_SESSION_TOKEN <YOUR_OPENAI_SESSION_TOKEN> -g
-    ```
-    3. Copy .env file to your project root directory, and set `OPENAI_PROXY_URL`.
 
-
-### Local prompt
+### Prompts library
 1. Create a `prompt` directory in the root directory of your project.
 1. Add `review.txt` or `tests.txt` in the `prompt` directory.
 
@@ -73,28 +58,8 @@ With Hermes, you can perform all kinds of magic tricks:
   hermes translate -d example/i18n/test.json
   ```
 
-### Options
-
-- `-k, --api-key <key>`: Set the OpenAI API key.
-- `-t, --openai-session-token <token>`: OpenAI session token, 2 step to get token, If you don't set this, will use OPENAI_API_KEY, will cause fee by api key.
-- `-pu, --openai-proxy-url <url>`: Proxy URL to use for OpenAI API requests.
-- `-m, --model <model>`: OpenAI model to use.
-- `-p, --prompt <prompt>`: OpenAI prompt to use.
-- `-mt, --max-tokens <tokens>`: OpenAI max tokens to use.
-- `-e, --file-extensions <extensions>`: File extensions to read, example: .ts,.tsx
-- `-r, --read-type <type>`: Read files from directory or git stage, example: dir or git.
-- `-s, --read-git-status <name>`: Read files from git stage by status default: A,R,M.
-- `-d, --read-dir-name <name>`: Root name of the directory to read files from, example: src.
-- `-f, --test-file-type <type>`: Generate test file type, example: test or spec.
-- `-n, --test-file-dir-name <name>`: Generate test file directory name, example: __tests__.
-- `-o, --test-file-overwrite <value>`: Generate test file overwrite, default is true.
-- `-w, --review-report-webhook <url>`: Webhook URL to send review report.
-
 ### Environment Variables options
 See .env
 
-## Note
-1. You can set all options in `.env` or `.env.local`, which will be used as default options. Command options will override the default options.
-2. The webhook currently only works with `seaTalk`. If you need to use another channel, please raise a `PR` yourself or ask for help.
 
 Now go forth and code like a wizard! 🧙‍♂️

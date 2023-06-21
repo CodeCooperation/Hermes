@@ -2,7 +2,7 @@ import {
   codeBlocksMdSymbolRegex,
   codeBlocksRegex,
   reviewFileName,
-} from 'src/constant';
+} from 'src/utilities/constant';
 
 export const replaceCodeBlock = (
   data: string,
@@ -11,7 +11,6 @@ export const replaceCodeBlock = (
   return data.replace(codeBlocksRegex, placeholder);
 };
 
-// Math all code blocks
 export const getAllCodeBlock = (data: string): string => {
   const codeBlocks = data.match(codeBlocksRegex);
   return codeBlocks
@@ -25,7 +24,6 @@ export const getAllCodeBlock = (data: string): string => {
     : data;
 };
 
-// Send simple data, remove code blocks and replace with a string
 export const simplyReviewData = (data: string) => {
   return replaceCodeBlock(data)
     .replace(/'/g, '')

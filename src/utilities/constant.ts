@@ -9,9 +9,7 @@ import { HermesTypeEnum, IUserOptions, ReadTypeEnum } from './types';
 export const OPENAI_API_KEY_NAME = 'OPENAI_API_KEY';
 export const OPENAI_SESSION_TOKEN_NAME = 'OPENAI_SESSION_TOKEN';
 
-// Fetch openAI api retry times
 export const OPENAI_MAX_RETRY = 3;
-// Fetch openAI api max continues times
 export const OPENAI_MAX_CONTINUES = 5;
 
 const DEFAULT_MODELS = {
@@ -20,9 +18,6 @@ const DEFAULT_MODELS = {
 };
 
 export const ROOT_SRC_DIR_PATH = __dirname;
-// export const ROOT_SRC_DIR_PATH = path.join(
-//   new URL('.', import.meta.url).pathname,
-// );
 
 class UserOptionsClass {
   options: IUserOptions;
@@ -43,17 +38,11 @@ class UserOptionsClass {
     translate: 'zh,en',
   };
 
-  /**
-   * Get hermes run type
-   * @example
-   * // returns 'test'
-   */
   get hermesType(): HermesTypeEnum {
     if (!this.options.hermesType) throw new Error('hermesType is not set');
     return this.options.hermesType;
   }
 
-  // get open AI key from npm config
   private getOpenAIKeyFromNpmConfig(key: string): string {
     try {
       return execSync(`npm config get ${key}`).toString().trim();
@@ -62,11 +51,6 @@ class UserOptionsClass {
     }
   }
 
-  /**
-   * Get OpenAI API key
-   * @example
-   * @returns 'sk-1234567890'
-   */
   get openAIKey(): string {
     if (!this.options.openAIKey) {
       this.options.openAIKey =
@@ -81,9 +65,6 @@ class UserOptionsClass {
     return this.options.openAIKey;
   }
 
-  /**
-   * Get OpenAI session token
-   */
   get openAISessionToken(): string {
     if (!this.options.openAISessionToken) {
       this.options.openAISessionToken = this.getOpenAIKeyFromNpmConfig(
@@ -94,9 +75,6 @@ class UserOptionsClass {
     return this.options.openAISessionToken;
   }
 
-  /**
-   * Get OpenAI send message type, proxy or api
-   */
   get openAISendByProxy(): boolean {
     return (
       this.options.openAIProxyUrl &&
@@ -119,9 +97,6 @@ class UserOptionsClass {
     return this.options.openAIModel || DEFAULT_MODELS.apiModel;
   }
 
-  /**
-   * Get OpenAI options
-   */
   get openAIOptions(): ChatGPTAPIOptions['completionParams'] {
     if (!this.openAIModel) throw new Error('openAIModel is not set');
 
@@ -134,48 +109,30 @@ class UserOptionsClass {
     };
   }
 
-  /**
-   * Get the root directory path to read files from
-   * @example
-   * // returns '/Users/username/project/src'
-   */
   get readFilesRoot(): string {
     if (!this.options.readFilesRootName)
       throw new Error('readFilesRootName is not set');
     return path.join(process.cwd(), this.options.readFilesRootName);
   }
 
-  /**
-   * Get the file extensions to read
-   * @example
-   * // returns ['.ts', '.tsx']
-   */
   get readFilesExtensions(): string[] {
     if (!this.options.readFileExtensions)
       throw new Error('readFileExtensions is not set');
     return this.options.readFileExtensions.split(',');
   }
 
-  /**
-   * File read type, either 'dir' or 'git'
-   */
   get readFileType(): ReadTypeEnum {
     if (!this.options.readType) throw new Error('readType is not set');
     return this.options.readType;
   }
 
-  /**
-   * Get user openAIPrompt arg, if prompts is a file path, read the file
-   */
   get openAIPrompt(): string {
     const { openAIPrompt } = this.options;
 
     if (!openAIPrompt) return '';
 
-    // Split the string by comma to get individual file paths
     const filePaths = openAIPrompt.split(',');
 
-    // Filter out invalid file paths and read each file's content
     const filesContent = filePaths
       .filter(
         (filePath) => fs.existsSync(filePath) && fs.statSync(filePath).isFile(),
@@ -188,9 +145,6 @@ class UserOptionsClass {
       : openAIPrompt;
   }
 
-  /**
-   * Convert the process.env to user options
-   */
   private convertProcessEnvToUserOptions(
     processEnv: NodeJS.ProcessEnv,
   ): IUserOptions {
@@ -239,10 +193,6 @@ class UserOptionsClass {
     };
   }
 
-  /**
-   * Security test
-   * If return false, the prompt does not pass the security test
-   */
   public securityPrompt(prompt: string): string {
     if (!this.options.securityRegex) return prompt;
 
@@ -251,12 +201,7 @@ class UserOptionsClass {
     return prompt.replace(regex, 'REMOVED');
   }
 
-  /**
-   * Initialize the user options
-   */
-
   public init(userOptions: IUserOptions = {}) {
-    // Read the .env file
     config();
     config({ path: path.join(process.cwd(), '.env.local') });
     const envUserOptions = this.convertProcessEnvToUserOptions(process.env);
@@ -277,12 +222,8 @@ class UserOptionsClass {
 
 export const userOptions = new UserOptionsClass();
 
-/**
- * Review result configs
- */
 export const codeBlocksRegex = /```([\s\S]*?)```/g;
 
 export const codeBlocksMdSymbolRegex = /```(\w?)*/g;
 
-// Write the output text to a file if there are code blocks
 export const reviewFileName = '.hermes_review.md';

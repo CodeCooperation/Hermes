@@ -1,18 +1,12 @@
 import fs from 'fs';
-import { userOptions } from 'src/constant';
-import { IReadFileResult } from 'src/types';
-import { getAllCodeBlock } from 'src/utils';
-import getConflictResult from 'src/utils/write-conflict';
+import { userOptions } from 'src/utilities/constant';
+import { getAllCodeBlock } from 'src/utilities/modifier/simply-result';
+import { IReadFileResult } from 'src/utilities/types';
+import getConflictResult from 'src/utilities/writer/write-conflict';
 
 import HermesBase from './base';
 
-/**
- * Translate for a given file path
- */
 class HermesTranslate extends HermesBase {
-  /**
-   * Write message to a file
-   */
   private writeMessageToFile(
     { filePath, fileContent }: IReadFileResult,
     message: string,
@@ -27,11 +21,7 @@ class HermesTranslate extends HermesBase {
     }
   }
 
-  /**
-   * Translate content for a given file
-   */
   public async run(fileResult: IReadFileResult): Promise<string> {
-    // Reset the parent message to avoid the message tokens over limit
     this.openai.resetParentMessage();
     const message = await this.openai.run(fileResult);
     if (!message?.length) return;

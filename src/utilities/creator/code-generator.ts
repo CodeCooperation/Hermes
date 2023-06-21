@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { userOptions } from 'src/constant';
 import { HermesCreate } from 'src/hermes';
-import { getFileNameToCamelCase, makeDirExist } from 'src/utils';
-import { readPromptFile } from 'src/utils/read-prompt-file';
-import getConflictResult from 'src/utils/write-conflict';
+import { userOptions } from 'src/utilities/constant';
+import { getFileNameToCamelCase, makeDirExist } from 'src/utilities/helpers';
+import { readPromptFile } from 'src/utilities/reader/read-prompt-file';
+import getConflictResult from 'src/utilities/writer/write-conflict';
 
 import { IOptionCreated, OptionType, OptionTypeExtension } from './constant';
 
@@ -16,10 +16,6 @@ interface IWriteFileOptions {
   rootDirPath?: string;
 }
 
-/**
- * Code Generator for create command
- * @usage new CreateCodeGenerator(options).run()
- */
 class CreateCodeGenerator {
   private option: OptionType;
   private description: string;
@@ -35,7 +31,6 @@ class CreateCodeGenerator {
     this.hermes = new HermesCreate();
   }
 
-  // Get crete prompts
   private getPrompts() {
     const { option, description, dirName, name } = this;
     const basePrompts = [
@@ -71,7 +66,6 @@ class CreateCodeGenerator {
     return basePrompts;
   }
 
-  // Write AI message to file
   private writeFile(options: IWriteFileOptions) {
     const {
       fileName,
@@ -104,7 +98,6 @@ class CreateCodeGenerator {
     );
   }
 
-  // Handle models option
   private handleModelsOption(dirName: string, name: string, message: string[]) {
     const [modelContent, serviceContent, mockContent] = message;
     const fileName = `${dirName}${getFileNameToCamelCase(name, true)}`;
@@ -128,7 +121,6 @@ class CreateCodeGenerator {
     });
   }
 
-  // Set options
   setOptions(options: IOptionCreated) {
     this.option = options.option;
     this.description = options.description;
@@ -136,7 +128,6 @@ class CreateCodeGenerator {
     this.name = options.name;
   }
 
-  // Run code generator
   async generator() {
     const prompts = this.getPrompts();
     const message = await this.hermes.run({ prompts });
