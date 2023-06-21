@@ -63,3 +63,6 @@ See .env
 
 
 Now go forth and code like a wizard! 🧙‍♂️
+
+### Attribution
+This project is a mix of different opensource tools.
