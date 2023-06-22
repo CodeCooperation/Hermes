@@ -8,7 +8,11 @@ var __dirname = /* @__PURE__ */ getDirname();
 // src/index.ts
 import "isomorphic-fetch";
 
-// src/constant.ts
+// src/hermes/test.ts
+import fs6 from "fs";
+import path4 from "path";
+
+// src/utilities/constant.ts
 import { execSync } from "child_process";
 import { config } from "dotenv";
 import fs from "fs";
@@ -40,17 +44,11 @@ var UserOptionsClass = class {
       translate: "zh,en"
     };
   }
-  /**
-   * Get hermes run type
-   * @example
-   * // returns 'test'
-   */
   get hermesType() {
     if (!this.options.hermesType)
       throw new Error("hermesType is not set");
     return this.options.hermesType;
   }
-  // get open AI key from npm config
   getOpenAIKeyFromNpmConfig(key) {
     try {
       return execSync(`npm config get ${key}`).toString().trim();
@@ -58,11 +56,6 @@ var UserOptionsClass = class {
       return "";
     }
   }
-  /**
-   * Get OpenAI API key
-   * @example
-   * @returns 'sk-1234567890'
-   */
   get openAIKey() {
     if (!this.options.openAIKey) {
       this.options.openAIKey = this.getOpenAIKeyFromNpmConfig(OPENAI_API_KEY_NAME);
@@ -73,9 +66,6 @@ var UserOptionsClass = class {
       console.log(`openAI key: "${this.options.openAIKey}"`);
     return this.options.openAIKey;
   }
-  /**
-   * Get OpenAI session token
-   */
   get openAISessionToken() {
     if (!this.options.openAISessionToken) {
       this.options.openAISessionToken = this.getOpenAIKeyFromNpmConfig(
@@ -84,9 +74,6 @@ var UserOptionsClass = class {
     }
     return this.options.openAISessionToken;
   }
-  /**
-   * Get OpenAI send message type, proxy or api
-   */
   get openAISendByProxy() {
     return this.options.openAIProxyUrl && this.openAISessionToken && this.openAISessionToken !== "undefined";
   }
@@ -102,9 +89,6 @@ var UserOptionsClass = class {
     }
     return this.options.openAIModel || DEFAULT_MODELS.apiModel;
   }
-  /**
-   * Get OpenAI options
-   */
   get openAIOptions() {
     if (!this.openAIModel)
       throw new Error("openAIModel is not set");
@@ -116,37 +100,21 @@ var UserOptionsClass = class {
       max_tokens: this.options.openAIMaxTokens
     };
   }
-  /**
-   * Get the root directory path to read files from
-   * @example
-   * // returns '/Users/username/project/src'
-   */
   get readFilesRoot() {
     if (!this.options.readFilesRootName)
       throw new Error("readFilesRootName is not set");
     return path2.join(process.cwd(), this.options.readFilesRootName);
   }
-  /**
-   * Get the file extensions to read
-   * @example
-   * // returns ['.ts', '.tsx']
-   */
   get readFilesExtensions() {
     if (!this.options.readFileExtensions)
       throw new Error("readFileExtensions is not set");
     return this.options.readFileExtensions.split(",");
   }
-  /**
-   * File read type, either 'dir' or 'git'
-   */
   get readFileType() {
     if (!this.options.readType)
       throw new Error("readType is not set");
     return this.options.readType;
   }
-  /**
-   * Get user openAIPrompt arg, if prompts is a file path, read the file
-   */
   get openAIPrompt() {
     const { openAIPrompt } = this.options;
     if (!openAIPrompt)
@@ -157,9 +125,6 @@ var UserOptionsClass = class {
     ).map((filePath) => fs.readFileSync(filePath.trim(), "utf-8")).join("\n");
     return filesContent ? `Note here is context that you need understand: ${filesContent}.` : openAIPrompt;
   }
-  /**
-   * Convert the process.env to user options
-   */
   convertProcessEnvToUserOptions(processEnv) {
     return {
       debug: process.env.DEBUG === "true",
@@ -193,19 +158,12 @@ var UserOptionsClass = class {
       translate: processEnv.TRANSLATE || this.userOptionsDefault.translate
     };
   }
-  /**
-   * Security test
-   * If return false, the prompt does not pass the security test
-   */
   securityPrompt(prompt) {
     if (!this.options.securityRegex)
       return prompt;
     const regex = new RegExp(this.options.securityRegex, "gi");
     return prompt.replace(regex, "REMOVED");
   }
-  /**
-   * Initialize the user options
-   */
   init(userOptions2 = {}) {
     config();
     config({ path: path2.join(process.cwd(), ".env.local") });
@@ -227,23 +185,11 @@ var codeBlocksRegex = /```([\s\S]*?)```/g;
 var codeBlocksMdSymbolRegex = /```(\w?)*/g;
 var reviewFileName = ".hermes_review.md";
 
-// src/create/index.ts
-import inquirer from "inquirer";
-import ora2 from "ora";
-
-// src/create/code-generator.ts
-import fs9 from "fs";
-import path6 from "path";
-
-// src/hermes/test.ts
-import fs6 from "fs";
-import path4 from "path";
-
-// src/utils/index.ts
+// src/utilities/helpers.ts
 import { execSync as execSync2 } from "child_process";
 import fs2 from "fs";
 
-// src/utils/simply-result.ts
+// src/utilities/modifier/simply-result.ts
 var replaceCodeBlock = (data, placeholder = `check your local __${reviewFileName}__`) => {
   return data.replace(codeBlocksRegex, placeholder);
 };
@@ -257,7 +203,7 @@ var simplyReviewData = (data) => {
   return replaceCodeBlock(data).replace(/'/g, "").replace(/`/g, "__").replace(/\n/g, "\\r");
 };
 
-// src/utils/index.ts
+// src/utilities/helpers.ts
 var getUserEmail = () => {
   const output = execSync2("git config user.email").toString().trim();
   return output;
@@ -286,7 +232,7 @@ var getFileNameToCamelCase = (fileName, isFirstUpper = false) => {
   }).join("");
 };
 
-// src/utils/write-conflict.ts
+// src/utilities/writer/write-conflict.ts
 function getConflictResult(sourceContent, targetContent) {
   const removeStartAndEndEmptyLine = (content) => {
     const lines = content.split("\n");
@@ -356,7 +302,7 @@ function getConflictResult(sourceContent, targetContent) {
 }
 var write_conflict_default = getConflictResult;
 
-// src/chatgpt/index.ts
+// src/utilities/opeai-talker/index.ts
 import { AbortController } from "abort-controller";
 import chalk from "chalk";
 import {
@@ -365,14 +311,28 @@ import {
 } from "chatgpt";
 import ora from "ora";
 
-// src/chatgpt/prompt.ts
+// src/utilities/opeai-talker/prompt.ts
 import fs5 from "fs";
 
-// src/utils/extract-code-prompts.ts
+// src/utilities/reader/read-prompt-file.ts
+import fs3 from "fs";
+import path3 from "path";
+var readPromptFile = (fileName) => {
+  const userLocalPath = path3.join(process.cwd(), "prompt", fileName);
+  if (fs3.existsSync(userLocalPath)) {
+    return fs3.readFileSync(userLocalPath, "utf-8");
+  }
+  return fs3.readFileSync(
+    path3.join(ROOT_SRC_DIR_PATH, "prompt", fileName),
+    "utf-8"
+  );
+};
+
+// src/utilities/extractor/extract-code-prompts.ts
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
-import fs3 from "fs";
+import fs4 from "fs";
 var traverseFunc = typeof traverse === "function" ? traverse : traverse.default;
 var generateFunc = typeof generate === "function" ? generate : generate.default;
 var ExtractCodePrompts = class {
@@ -380,9 +340,6 @@ var ExtractCodePrompts = class {
     this.remainingCode = [];
     this.remainingEndIndex = 0;
   }
-  /**
-   * Check if the node is a function or class
-   */
   isFunctionOrClass(nodePath) {
     if (!nodePath)
       return true;
@@ -391,9 +348,6 @@ var ExtractCodePrompts = class {
     );
     return nodePath.isFunction() || nodePath.isClass() || isVariableDeclarationFunction;
   }
-  /**
-   * Pick function or class code from the given code
-   */
   extractFunctionOrClassCodeArray({
     fileContent,
     filePath
@@ -420,27 +374,13 @@ var ExtractCodePrompts = class {
       if ((_a = userOptions.options) == null ? void 0 : _a.debug)
         console.error("Babel parse error: ", e);
       return [
-        fs3.existsSync(filePath) ? fs3.readFileSync(filePath, "utf-8") : fileContent
+        fs4.existsSync(filePath) ? fs4.readFileSync(filePath, "utf-8") : fileContent
       ];
     }
   }
 };
 
-// src/utils/read-prompt-file.ts
-import fs4 from "fs";
-import path3 from "path";
-var readPromptFile = (fileName) => {
-  const userLocalPath = path3.join(process.cwd(), "prompt", fileName);
-  if (fs4.existsSync(userLocalPath)) {
-    return fs4.readFileSync(userLocalPath, "utf-8");
-  }
-  return fs4.readFileSync(
-    path3.join(ROOT_SRC_DIR_PATH, "prompt", fileName),
-    "utf-8"
-  );
-};
-
-// src/chatgpt/prompt.ts
+// src/utilities/opeai-talker/prompt.ts
 var HermesPrompt = class {
   constructor(hermesType) {
     this.hermesType = hermesType;
@@ -518,7 +458,7 @@ ${prompts.slice(0, 1)}`,
   }
 };
 
-// src/chatgpt/send-message.ts
+// src/utilities/opeai-talker/send-message.ts
 var sendMessageWithRetry = async (sendMessage, retries = OPENAI_MAX_RETRY, retryDelay = 3e3) => {
   for (let retry = 0; retry < retries; retry++) {
     try {
@@ -569,55 +509,43 @@ var handleContinueMessage = async (message, sendMessage, maxContinueAttempts = O
   return resMessage;
 };
 
-// src/chatgpt/index.ts
+// src/utilities/opeai-talker/index.ts
 var ChatgptProxyAPI = class {
   constructor() {
-    this.initApi();
+    this.initChatApi();
   }
-  get needPrintMessage() {
+  get needPrintMsg() {
     return true;
   }
-  initApi() {
+  initChatApi() {
     if (process.env.DEBUG)
       console.log(`openAI session token: "${userOptions.openAISessionToken}"`);
-    console.log(
-      "[ \u{1F9D9} hermes ] Using Model:",
-      chalk.green(userOptions.openAIModel)
-    );
+    console.log("[ \u{1F9D9} hermes ] Using Model:", chalk.green(userOptions.openAIModel));
     if (!userOptions.openAISendByProxy) {
-      this.api = new ChatGPTAPI({
+      this.chatApi = new ChatGPTAPI({
         apiKey: userOptions.openAIKey,
         completionParams: userOptions.openAIOptions,
         debug: userOptions.options.debug
       });
       return;
     }
-    this.api = new ChatGPTUnofficialProxyAPI({
+    this.chatApi = new ChatGPTUnofficialProxyAPI({
       model: userOptions.openAIModel,
       accessToken: userOptions.openAISessionToken,
       apiReverseProxyUrl: userOptions.options.openAIProxyUrl
     });
   }
-  /**
-   * Generate prompt for the OpenAI API
-   */
-  generatePrompt(fileResult) {
+  generatePrompt(fileRes) {
     const hermesType = new HermesPrompt(userOptions.hermesType);
-    return hermesType.generatePrompt(fileResult);
+    return hermesType.generatePrompt(fileRes);
   }
-  /**
-   * Is the review passed?
-   */
-  isReviewPassed(message) {
+  isReviewPassed(msg) {
     if (userOptions.hermesType !== "review" /* Review */)
       return true;
-    return /perfect!/gi.test(message);
+    return /perfect!/gi.test(msg);
   }
-  /**
-   * Log the review info
-   */
-  oraStart(text = "", needPrintMessage = this.needPrintMessage) {
-    if (!needPrintMessage)
+  oraStart(text = "", needPrintMsg = this.needPrintMsg) {
+    if (!needPrintMsg)
       return ora();
     return ora({
       text,
@@ -627,45 +555,39 @@ var ChatgptProxyAPI = class {
       }
     }).start();
   }
-  /**
-   * Run the OpenAI API
-   */
-  // Send the prompt to the API
-  async sendPrompt(prompt, prevMessage) {
+  async sendPrompt(prompt, prevMsg) {
     const securityPrompt = userOptions.securityPrompt(prompt);
-    if (!prevMessage) {
+    if (!prevMsg) {
       return await sendMessageWithRetry(
-        () => this.api.sendMessage(securityPrompt)
+        () => this.chatApi.sendMessage(securityPrompt)
       );
     }
     const reviewSpinner = this.oraStart();
     const controller = new AbortController();
     const signal = controller.signal;
     const sendOptions = {
-      ...prevMessage,
-      // Set the timeout to 5 minutes
+      ...prevMsg,
       timeoutMs: 1e3 * 60 * 5,
-      // @ts-ignore
       abortSignal: signal,
       onProgress: (partialResponse) => {
         reviewSpinner.text = partialResponse.text;
       }
     };
     try {
-      let resMessage = await sendMessageWithRetry(
-        () => this.api.sendMessage(securityPrompt, sendOptions)
+      let resMsg = await sendMessageWithRetry(
+        () => this.chatApi.sendMessage(securityPrompt, sendOptions)
       );
-      resMessage = await handleContinueMessage(
-        resMessage,
-        (message, options) => this.api.sendMessage(message, { ...sendOptions, ...options })
+      resMsg = await handleContinueMessage(
+        resMsg,
+        (msg, options) => this.chatApi.sendMessage(msg, { ...sendOptions, ...options })
       );
-      const isReviewPassed = this.isReviewPassed(resMessage.text);
-      const colorText = isReviewPassed ? chalk.green(resMessage.text) : chalk.yellow(resMessage.text);
+      const isReviewPassed = this.isReviewPassed(resMsg.text);
+      const colorText = isReviewPassed ? chalk.green(resMsg.text) : chalk.yellow(resMsg.text);
       reviewSpinner[isReviewPassed ? "succeed" : "fail"](
         `[ \u{1F9D9} hermes ] ${colorText} 
  `
       );
-      return resMessage;
+      return resMsg;
     } catch (error) {
       reviewSpinner.fail(`[ \u{1F9D9} hermes ] ${error.message} 
  `);
@@ -673,47 +595,40 @@ var ChatgptProxyAPI = class {
       throw error;
     }
   }
-  /**
-   * Generate a prompt for a given file, then send it to the OpenAI API
-   */
-  async sendFileResult(fileResult) {
-    const promptArray = this.generatePrompt(fileResult);
+  async sendFileRes(fileRes) {
+    const promptArray = this.generatePrompt(fileRes);
     const [systemPrompt, ...codePrompts] = promptArray;
     if (userOptions.options.debug) {
       console.log("[ \u{1F9D9} hermes ] systemPrompt:", systemPrompt);
-      console.log("[ \u{1F9D9} hermes ] codePrompts:", codePrompts.length, codePrompts);
+      console.log(
+        "[ \u{1F9D9} hermes ] codePrompts:",
+        codePrompts.length,
+        codePrompts
+      );
     }
     if (!codePrompts.length)
       return [];
-    const messageArray = [];
-    let message = this.parentMessage || await this.sendPrompt(systemPrompt);
+    const msgArray = [];
+    let msg = this.parentMsg || await this.sendPrompt(systemPrompt);
     for (const prompt of codePrompts) {
-      message = await this.sendPrompt(prompt, {
-        conversationId: message == null ? void 0 : message.conversationId,
-        parentMessageId: message == null ? void 0 : message.id
+      msg = await this.sendPrompt(prompt, {
+        conversationId: msg == null ? void 0 : msg.conversationId,
+        parentMessageId: msg == null ? void 0 : msg.id
       });
-      messageArray.push(message.text);
-      this.parentMessage = message;
+      msgArray.push(msg.text);
+      this.parentMsg = msg;
     }
-    return messageArray;
+    return msgArray;
   }
-  /**
-   * Reset the parent message
-   */
-  resetParentMessage() {
-    this.parentMessage = void 0;
+  resetParentMsg() {
+    this.parentMsg = void 0;
   }
-  /**
-   * Start the hermes process
-   */
-  async run(fileResult) {
+  async run(fileRes) {
     const reviewSpinner = this.oraStart(
-      chalk.cyan(
-        `[ \u{1F9D9} hermes ] start ${userOptions.hermesType} your code... 
-`
-      )
+      chalk.cyan(`[ \u{1F9D9} hermes ] start ${userOptions.hermesType} your code... 
+`)
     );
-    return this.sendFileResult(fileResult).then((res) => {
+    return this.sendFileRes(fileRes).then((res) => {
       reviewSpinner.succeed(
         chalk.green(
           `\u{1F389}\u{1F389} [ \u{1F9D9} hermes ] ${userOptions.hermesType} code successfully! \u{1F389}\u{1F389}
@@ -746,21 +661,12 @@ var base_default = HermesBase;
 
 // src/hermes/test.ts
 var HermesTest = class extends base_default {
-  /**
-   * Get the file name without the extension
-   */
   getFileNameWithoutExtension(filePath) {
     return path4.basename(filePath, path4.extname(filePath));
   }
-  /**
-   * Get the file extension
-   */
   getFileExtension(filePath) {
     return path4.extname(filePath);
   }
-  /**
-   * Write a test message to a file
-   */
   async writeTestMessageToFile({ filePath, fileContent }, message) {
     try {
       const testFileDirName = userOptions.options.testFileDirName;
@@ -791,9 +697,6 @@ ${message}
       console.error("Error writing message to file:", error);
     }
   }
-  /**
-   * Generate a test case for a given file
-   */
   async run(fileResult) {
     this.openai.resetParentMessage();
     const message = await this.openai.run(fileResult);
@@ -806,7 +709,7 @@ ${message}
 };
 var test_default = HermesTest;
 
-// src/webhook/index.ts
+// src/utilities/webhook/index.ts
 import { exec } from "child_process";
 import fs7 from "fs";
 import path5 from "path";
@@ -873,15 +776,9 @@ var HermesReview = class extends base_default {
     super();
     this.publishChannel = new webhook_default();
   }
-  /**
-   * Write a test message to a file
-   */
   async postAIMessage(filePath, message) {
     this.publishChannel.addNoticeTask({ filePath, message });
   }
-  /**
-   * Generate a test case for a given file
-   */
   async run(fileResult) {
     this.openai.resetParentMessage();
     const message = await this.openai.run(fileResult);
@@ -891,9 +788,6 @@ var HermesReview = class extends base_default {
     this.postAIMessage(fileResult.filePath, resMessage);
     return resMessage;
   }
-  /**
-   * Publish the notices to the webhook channel
-   */
   publishNotice() {
     this.publishChannel.publishNotice();
   }
@@ -902,9 +796,6 @@ var review_default = HermesReview;
 
 // src/hermes/create.ts
 var HermesCreate = class extends base_default {
-  /**
-   * Generate a test case for a given file
-   */
   async run(fileResult) {
     const message = await this.openai.run(fileResult);
     if (!(message == null ? void 0 : message.length))
@@ -919,9 +810,6 @@ var create_default = HermesCreate;
 
 // src/hermes/modify.ts
 var HermesModify = class extends base_default {
-  /**
-   * Generate a test case for a given file
-   */
   async run(fileResult) {
     const message = await this.openai.run(fileResult);
     if (!(message == null ? void 0 : message.length))
@@ -937,9 +825,6 @@ var modify_default = HermesModify;
 // src/hermes/translate.ts
 import fs8 from "fs";
 var HermesTranslate = class extends base_default {
-  /**
-   * Write message to a file
-   */
   writeMessageToFile({ filePath, fileContent }, message) {
     try {
       if (userOptions.options.debug) {
@@ -950,9 +835,6 @@ var HermesTranslate = class extends base_default {
       console.error("Error writing message to file:", error);
     }
   }
-  /**
-   * Translate content for a given file
-   */
   async run(fileResult) {
     this.openai.resetParentMessage();
     const message = await this.openai.run(fileResult);
@@ -965,7 +847,15 @@ var HermesTranslate = class extends base_default {
 };
 var translate_default = HermesTranslate;
 
-// src/create/constant.ts
+// src/utilities/creator/index.ts
+import inquirer from "inquirer";
+import ora2 from "ora";
+
+// src/utilities/creator/code-generator.ts
+import fs9 from "fs";
+import path6 from "path";
+
+// src/utilities/creator/constant.ts
 var OptionTypeExtension = {
   ["components" /* Components */]: "tsx",
   ["pages" /* Pages */]: "tsx",
@@ -990,7 +880,7 @@ var messages = {
   continueOrFinish: "Do you want to continue or finish?"
 };
 
-// src/create/code-generator.ts
+// src/utilities/creator/code-generator.ts
 var CreateCodeGenerator = class {
   constructor() {
     this.init();
@@ -998,7 +888,6 @@ var CreateCodeGenerator = class {
   init() {
     this.hermes = new create_default();
   }
-  // Get crete prompts
   getPrompts() {
     const { option, description, dirName, name } = this;
     const basePrompts = [
@@ -1025,7 +914,6 @@ var CreateCodeGenerator = class {
     }
     return basePrompts;
   }
-  // Write AI message to file
   writeFile(options) {
     const {
       fileName,
@@ -1051,7 +939,6 @@ var CreateCodeGenerator = class {
       existFileContent ? write_conflict_default(existFileContent, fileContent) : fileContent
     );
   }
-  // Handle models option
   handleModelsOption(dirName, name, message) {
     const [modelContent, serviceContent, mockContent] = message;
     const fileName = `${dirName}${getFileNameToCamelCase(name, true)}`;
@@ -1074,14 +961,12 @@ var CreateCodeGenerator = class {
       optionType: "mock" /* Mock */
     });
   }
-  // Set options
   setOptions(options) {
     this.option = options.option;
     this.description = options.description;
     this.dirName = options.dirName;
     this.name = options.name;
   }
-  // Run code generator
   async generator() {
     const prompts = this.getPrompts();
     const message = await this.hermes.run({ prompts });
@@ -1105,7 +990,7 @@ var CreateCodeGenerator = class {
 };
 var code_generator_default = CreateCodeGenerator;
 
-// src/create/index.ts
+// src/utilities/creator/index.ts
 var CreateCLI = class {
   constructor() {
     this.init();
@@ -1209,9 +1094,9 @@ var CreateCLI = class {
     }
   }
 };
-var create_default2 = CreateCLI;
+var creator_default = CreateCLI;
 
-// src/modify/index.ts
+// src/utilities/modifier/index.ts
 import fs10 from "fs";
 import inquirer2 from "inquirer";
 import ora3 from "ora";
@@ -1223,9 +1108,6 @@ var ModifyCLI = class {
   init() {
     this.hermes = new modify_default();
   }
-  /**
-   * Prompt description from user
-   */
   async promptOptionDescription() {
     const { description } = await inquirer2.prompt([
       {
@@ -1238,9 +1120,6 @@ var ModifyCLI = class {
     ]);
     return description;
   }
-  /**
-   * Prompt continue or finish from user
-   */
   async promptContinueOrFinish() {
     const { action } = await inquirer2.prompt([
       {
@@ -1252,14 +1131,12 @@ var ModifyCLI = class {
     ]);
     return action === "Continue";
   }
-  // Write AI message to file
   writeFile(filePath, newContent) {
     fs10.writeFileSync(
       filePath,
       write_conflict_default(fs10.readFileSync(filePath, "utf-8"), newContent)
     );
   }
-  // Run single file modify
   async runSingleFile(fileResult, continueTimes) {
     if (!(fileResult == null ? void 0 : fileResult.filePath))
       throw new Error("File path is empty");
@@ -1281,9 +1158,6 @@ var ModifyCLI = class {
     this.writeFile(fileResult.filePath, message.join("\n"));
     spinner.stop();
   }
-  /**
-   * Start CLI
-   */
   async start() {
     var _a;
     if (!((_a = this.readFileResult) == null ? void 0 : _a.length))
@@ -1299,33 +1173,28 @@ var ModifyCLI = class {
     }
   }
 };
-var modify_default2 = ModifyCLI;
+var modifier_default = ModifyCLI;
 
-// src/reader/index.ts
+// src/utilities/reader/index.ts
 import ora4 from "ora";
 import path9 from "path";
 
-// src/reader/reader-directory.ts
+// src/utilities/reader/reader-directory.ts
 import fs11 from "fs";
 import path7 from "path";
 var ReadTestFilePathsByDirectory = class {
-  // Get all files in a directory
   getFilesInDirectory(dirPath) {
     return fs11.readdirSync(dirPath);
   }
-  // Check if a file path is a directory
   isDirectory(filePath) {
     return fs11.statSync(filePath).isDirectory();
   }
-  // Get file paths of all files in a subdirectory
   getSubDirectoryFilePaths(filePath) {
     return this.getDirFiles(filePath);
   }
-  // Get file content of a file
   getFileContent(filePath) {
     return fs11.readFileSync(filePath, "utf-8");
   }
-  // Get all file paths in a directory and its subdirectories
   getDirFiles(dirPath) {
     if (!this.isDirectory(dirPath)) {
       return [{ filePath: dirPath, fileContent: this.getFileContent(dirPath) }];
@@ -1346,27 +1215,17 @@ var ReadTestFilePathsByDirectory = class {
 };
 var reader_directory_default = ReadTestFilePathsByDirectory;
 
-// src/reader/reader-git-stage.ts
+// src/utilities/reader/reader-git-stage.ts
 import { execSync as execSync4 } from "child_process";
 import fs12 from "fs";
 import path8 from "path";
 
-// src/utils/extract-modify-funcs.ts
+// src/utilities/extractor/extract-modify-funcs.ts
 import { execSync as execSync3 } from "child_process";
 var GitDiffExtractor = class {
-  /**
-   * Retrieves the git diff output for the specified file path.
-   * @param filePath - The file path to retrieve the git diff output for.
-   * @returns The git diff output as a string.
-   */
   getGitDiffOutput(filePath) {
     return execSync3(`git diff --cached ${filePath}`).toString();
   }
-  /**
-   * Gets the line numbers of the modified lines in the git diff output.
-   * @param diffLines - The git diff output lines.
-   * @returns An array of modified line numbers.
-   */
   getModifiedLineNumbers(diffLines) {
     const modifiedLineNumbers = [];
     let currentLineNumber = 0;
@@ -1385,12 +1244,6 @@ var GitDiffExtractor = class {
     }
     return modifiedLineNumbers;
   }
-  /**
-   * Extracts a code block containing a function or class from the specified line number.
-   * @param lines - The lines of the target file.
-   * @param lineNumber - The line number of the modified line.
-   * @returns The extracted code block as a string or null if not found.
-   */
   extractCodeBlock(lines, lineNumber) {
     let startLine = lineNumber;
     let endLine = lineNumber;
@@ -1418,12 +1271,6 @@ var GitDiffExtractor = class {
     }
     return lines.slice(startLine, endLine + 1).join("\n");
   }
-  /**
-   * Finds the line number of the closing brace of a class.
-   * @param lines - The lines of the target file.
-   * @param startLine - The line number of the opening brace of the class.
-   * @returns The line number of the closing brace of the class.
-   */
   findClosingBrace(lines, startLine) {
     let openBraces = 0;
     for (let i = startLine; i < lines.length; i++) {
@@ -1436,18 +1283,9 @@ var GitDiffExtractor = class {
     }
     return lines.length - 1;
   }
-  /**
-   * Counts the occurrences of a specific character in a string.
-   * @param line - The string to search for the character in.
-   * @param char - The character to count occurrences of.
-   * @returns The number of occurrences of the character in the string.
-   */
   countChar(line, char) {
     return (line == null ? void 0 : line.split(char).length) - 1 || 0;
   }
-  /**
-   * Checks if the specified code block is contained in any of the existing code blocks.
-   */
   isCodeBlockContainedInExistingBlocks(codeBlock, existingBlocks) {
     for (const existingBlock of existingBlocks) {
       if (existingBlock.includes(codeBlock)) {
@@ -1456,17 +1294,11 @@ var GitDiffExtractor = class {
     }
     return false;
   }
-  /**
-   * Adds the specified code block to the array of extracted code blocks if it is not already contained in the array.
-   */
   addCodeBlockIfNotContained(blocks, newBlock) {
     if (!this.isCodeBlockContainedInExistingBlocks(newBlock, blocks) && !blocks.includes(newBlock)) {
       blocks.push(newBlock);
     }
   }
-  /**
-   * Extracts the modified functions from the specified file.
-   */
   extractModifiedFunction(filePath, contents) {
     const diffOutput = this.getGitDiffOutput(filePath);
     const diffLines = diffOutput == null ? void 0 : diffOutput.split("\n");
@@ -1488,14 +1320,11 @@ var GitDiffExtractor = class {
 };
 var extract_modify_funcs_default = GitDiffExtractor;
 
-// src/reader/reader-git-stage.ts
+// src/utilities/reader/reader-git-stage.ts
 var StagedFileReader = class {
   constructor() {
     this.stagedFiles = this.readStagedFiles();
   }
-  /**
-   * Read the staged files from git
-   */
   readStagedFiles() {
     var _a;
     const files = execSync4("git diff --cached --name-status").toString().split("\n").filter(Boolean);
@@ -1536,7 +1365,7 @@ var StagedFileReader = class {
 };
 var reader_git_stage_default = StagedFileReader;
 
-// src/reader/index.ts
+// src/utilities/reader/index.ts
 var ReadFiles = class {
   constructor({
     dirPath = userOptions.readFilesRoot,
@@ -1549,17 +1378,14 @@ var ReadFiles = class {
     this.dirPath = dirPath;
     this.fileExtensions = fileExtensions;
   }
-  // Get all file paths by directory
   getTestFilePathByDir() {
     const reader = new reader_directory_default();
     return reader.getDirFiles(this.dirPath);
   }
-  // Get all file paths by git stage
   getTestFilePathByGit() {
     const reader = new reader_git_stage_default();
     return reader.getStagedFiles();
   }
-  // Check if a file has a valid extension
   hasValidExtension(file) {
     const extension = path9.extname(file);
     if (!this.fileExtensions.length)
@@ -1568,13 +1394,11 @@ var ReadFiles = class {
       (ext) => ext === extension || ext === extension.slice(1)
     );
   }
-  // Check if a file is a test file
   isTestFile(file) {
     const extension = path9.extname(file);
     const testFileType = userOptions.options.testFileType;
     return file.endsWith(`.${testFileType}${extension}`);
   }
-  // Get all file paths that are not test files
   getFileResults(readFileType = userOptions.readFileType) {
     if (!this.readTypeMap[readFileType])
       throw new Error("Invalid test file read type");
@@ -1591,7 +1415,9 @@ var ReadFiles = class {
           fileResults.map((r) => r.filePath)
         );
       }
-      fileResults.length > 0 ? readSpinner.succeed("\u{1F31F}\u{1F31F} [ \u{1F9D9} hermes ] read files successfully! \u{1F31F}\u{1F31F}") : readSpinner.warn("\u{1F914}\u{1F914} [ \u{1F9D9} hermes ] read no files! \u{1F914}\u{1F914}");
+      fileResults.length > 0 ? readSpinner.succeed(
+        "\u{1F31F}\u{1F31F} [ \u{1F9D9} hermes ] read files successfully! \u{1F31F}\u{1F31F}"
+      ) : readSpinner.warn("\u{1F914}\u{1F914} [ \u{1F9D9} hermes ] read no files! \u{1F914}\u{1F914}");
       return fileResults;
     } catch (error) {
       readSpinner.fail(`[ \u{1F9D9} hermes ] read files failed: ${error}`);
@@ -1621,7 +1447,7 @@ var runMap = {
     hermes.publishNotice();
   },
   ["create" /* Create */]: async () => {
-    const cli = new create_default2();
+    const cli = new creator_default();
     await cli.start();
   },
   ["modify" /* Modify */]: async () => {
@@ -1629,7 +1455,7 @@ var runMap = {
     const files = reviewFiles.getFileResults();
     if (!files.length)
       return;
-    const cli = new modify_default2(files);
+    const cli = new modifier_default(files);
     await cli.start();
   },
   ["translate" /* Translate */]: async () => {

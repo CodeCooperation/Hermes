@@ -1,14 +1,7 @@
-/**
- * Get conflict result
- * @param sourceContent source content
- * @param targetContent target content
- * @returns conflict result
- */
 function getConflictResult(
   sourceContent: string,
   targetContent: string,
 ): string {
-  // Utility function to remove the start and end empty line of the content string
   const removeStartAndEndEmptyLine = (content: string): string[] => {
     const lines = content.split('\n');
     let start = 0;
@@ -26,7 +19,6 @@ function getConflictResult(
     });
   };
 
-  // Get the line number of the first difference between source and target
   const findFirstNotSameLineNumber = (
     sourceLines: string[],
     targetLines: string[],
@@ -40,7 +32,6 @@ function getConflictResult(
     return i;
   };
 
-  // Find reverse same lines length
   const findReverseSameLinesLength = (
     sourceLines: string[],
     targetLines: string[],
@@ -64,7 +55,6 @@ function getConflictResult(
   const sourceLines = removeStartAndEndEmptyLine(sourceContent);
   const targetLines = removeStartAndEndEmptyLine(targetContent);
 
-  // if the source and target are the same, return the source
   if (sourceLines.join('\n') === targetLines.join('\n')) {
     return sourceContent;
   }
@@ -78,7 +68,6 @@ function getConflictResult(
     targetLines,
   );
 
-  // Build the result array
   const resultLines: string[] = [
     ...sourceLines.slice(0, firstNotSameLineNumber),
     '<<<<<<< HEAD',

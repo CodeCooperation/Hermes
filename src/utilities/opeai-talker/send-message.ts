@@ -3,9 +3,8 @@ import {
   OPENAI_MAX_CONTINUES,
   OPENAI_MAX_RETRY,
   codeBlocksMdSymbolRegex,
-} from 'src/constant';
+} from 'src/utilities/constant';
 
-// Helper function to perform the API call with retries, handling specific status codes
 export const sendMessageWithRetry = async (
   sendMessage: () => Promise<ChatMessage>,
   retries = OPENAI_MAX_RETRY,
@@ -17,13 +16,10 @@ export const sendMessageWithRetry = async (
       return res;
     } catch (error) {
       if (error.statusCode === 401) {
-        // If statusCode is 401, do not retry
         throw error;
       } else if (error.statusCode === 429) {
-        // If statusCode is 429, sleep for retryDelay milliseconds then try again
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
       } else {
-        // If not a specified status code, and we've reached the maximum number of retries, throw the error
         if (retry === retries) {
           throw error;
         }
@@ -38,7 +34,6 @@ export const sendMessageWithRetry = async (
   throw new Error('sendMessage failed after retries');
 };
 
-// Handle continue message if needed
 export const handleContinueMessage = async (
   message: ChatMessage,
   sendMessage: (
@@ -77,6 +72,5 @@ export const handleContinueMessage = async (
 
     continueAttempts++;
   }
-
   return resMessage;
 };
