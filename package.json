@@ -1,6 +1,6 @@
 {
   "name": "hermes",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "lib/index.js",
   "type": "module",
@@ -24,8 +24,7 @@
     "prepare": "husky install",
     "prepublishOnly": "run-s test",
     "prettier": "prettier --write ./src",
-    "test": "jest --watch",
-    "preinstall": "npx npm-force-resolutions"
+    "test": "jest --watch"
   },
   "files": [
     "build",
