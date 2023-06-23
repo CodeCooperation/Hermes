@@ -10,8 +10,8 @@ import ora from 'ora';
 import { userOptions as options } from 'src/utilities/constant';
 import { HermesPrompt } from 'src/utilities/opeai-talker/prompt';
 
-import { handleContinueMessage, sendMessageWithRetry } from './send-message';
 import { HermesTypeEnum, IReadFileResult } from '../types';
+import { handleContinueMessage, sendMessageWithRetry } from './send-message';
 
 export class ChatgptProxyAPI {
   private chatApi: ChatGPTUnofficialProxyAPI | ChatGPTAPI;
