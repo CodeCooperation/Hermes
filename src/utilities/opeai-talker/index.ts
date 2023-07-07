@@ -147,7 +147,7 @@ export class ChatgptProxyAPI {
     return msgArray;
   }
 
-  public resetParentMsg() {
+  public resetParentMessage() {
     this.parentMsg = undefined;
   }
   async run(fileRes: IReadFileResult): Promise<string[]> {
