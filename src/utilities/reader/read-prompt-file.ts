@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { ROOT_SRC_DIR_PATH } from 'src/constant';
+import { ROOT_SRC_DIR_PATH } from 'src/utilities/constant';
 
 export const readPromptFile = (fileName: string): string => {
   const userLocalPath = path.join(process.cwd(), 'prompt', fileName);

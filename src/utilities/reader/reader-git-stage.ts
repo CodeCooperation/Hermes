@@ -1,14 +1,11 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { userOptions } from 'src/constant';
-import { IReadFileResult } from 'src/types';
-import GitDiffExtractor from 'src/utils/extract-modify-funcs';
+import { userOptions } from 'src/utilities/constant';
 
-/**
- * Read the staged files from git only when the file is added
- * @returns the file path of the staged files
- */
+import GitDiffExtractor from '../extractor/extract-modify-funcs';
+import { IReadFileResult } from '../types';
+
 class StagedFileReader {
   private stagedFiles: IReadFileResult[];
 
@@ -16,9 +13,6 @@ class StagedFileReader {
     this.stagedFiles = this.readStagedFiles();
   }
 
-  /**
-   * Read the staged files from git
-   */
   private readStagedFiles(): IReadFileResult[] {
     const files = execSync('git diff --cached --name-status')
       .toString()
@@ -35,14 +29,12 @@ class StagedFileReader {
       return [];
     }
 
-    // Add the path of each added, renamed, or modified file
     return files.reduce<IReadFileResult[]>((acc, file) => {
       const fileSplitArr = file.split('\t');
       const status = fileSplitArr[0].slice(0, 1);
       const filePath = fileSplitArr.slice(-1)[0];
       const fullPath = path.join(process.cwd(), filePath);
 
-      // Only read the files under the specified root directory and the specified status
       if (
         !readGitStatus.includes(status) ||
         !filePath.startsWith(`${readRootName}/`) ||
@@ -53,12 +45,10 @@ class StagedFileReader {
 
       const contents = fs.readFileSync(fullPath, 'utf-8');
 
-      // If the file is not modified, return the original file content
       if (status !== 'M') {
         return [...acc, { filePath: fullPath, fileContent: contents }];
       }
 
-      // If the file is modified, extract the modified function or class
       const codeExtractor = new GitDiffExtractor();
       const modifiedContents =
         codeExtractor.extractModifiedFunction(fullPath, contents) || '';

@@ -1,14 +1,11 @@
 import fs from 'fs';
 import inquirer from 'inquirer';
 import ora from 'ora';
-import { userOptions } from 'src/constant';
 import { HermesModify } from 'src/hermes';
 import { IReadFileResult } from 'src/types';
-import getConflictResult from 'src/utils/write-conflict';
+import { userOptions } from 'src/utilities/constant';
+import getConflictResult from 'src/utilities/writer/write-conflict';
 
-/**
- * Hermes Modify CLI
- */
 class ModifyCLI {
   private hermes: HermesModify;
 
@@ -20,9 +17,6 @@ class ModifyCLI {
     this.hermes = new HermesModify();
   }
 
-  /**
-   * Prompt description from user
-   */
   private async promptOptionDescription(): Promise<string> {
     const { description } = await inquirer.prompt([
       {
@@ -40,9 +34,6 @@ class ModifyCLI {
     return description;
   }
 
-  /**
-   * Prompt continue or finish from user
-   */
   private async promptContinueOrFinish(): Promise<boolean> {
     const { action } = await inquirer.prompt([
       {
@@ -56,7 +47,6 @@ class ModifyCLI {
     return action === 'Continue';
   }
 
-  // Write AI message to file
   private writeFile(filePath: string, newContent: string) {
     fs.writeFileSync(
       filePath,
@@ -64,7 +54,6 @@ class ModifyCLI {
     );
   }
 
-  // Run single file modify
   private async runSingleFile(
     fileResult: IReadFileResult,
     continueTimes: number,
@@ -95,9 +84,6 @@ class ModifyCLI {
     spinner.stop();
   }
 
-  /**
-   * Start CLI
-   */
   async start() {
     if (!this.readFileResult?.length) throw new Error('File path is empty');
 

@@ -1,9 +1,9 @@
 import fs from 'fs';
 import ora from 'ora';
 import path from 'path';
-import { userOptions } from 'src/constant';
-import { IReadFileResult, ReadTypeEnum } from 'src/types';
+import { userOptions } from 'src/utilities/constant';
 
+import { IReadFileResult, ReadTypeEnum } from '../types';
 import ReadTestFilePathsByDirectory from './reader-directory';
 import StagedFileReader from './reader-git-stage';
 
@@ -24,37 +24,31 @@ class ReadFiles {
     [ReadTypeEnum.GitStage]: () => this.getTestFilePathByGit(),
   };
 
-  // Get all file paths by directory
   private getTestFilePathByDir(): IReadFileResult[] {
     const reader = new ReadTestFilePathsByDirectory();
     return reader.getDirFiles(this.dirPath);
   }
 
-  // Get all file paths by git stage
   private getTestFilePathByGit(): IReadFileResult[] {
     const reader = new StagedFileReader();
     return reader.getStagedFiles();
   }
 
-  // Check if a file has a valid extension
   private hasValidExtension(file: string): boolean {
     const extension = path.extname(file);
     if (!this.fileExtensions.length) return true;
 
-    // Check if the file extension is in the list of valid extensions, both match .ts or ts
     return this.fileExtensions.some(
       (ext) => ext === extension || ext === extension.slice(1),
     );
   }
 
-  // Check if a file is a test file
   private isTestFile(file: string): boolean {
     const extension = path.extname(file);
     const testFileType = userOptions.options.testFileType;
     return file.endsWith(`.${testFileType}${extension}`);
   }
 
-  // Get all file paths that are not test files
   public getFileResults(
     readFileType = userOptions.readFileType,
   ): IReadFileResult[] {
@@ -79,7 +73,9 @@ class ReadFiles {
       }
 
       fileResults.length > 0
-        ? readSpinner.succeed('🌟🌟 [ 🧙 hermes ] read files successfully! 🌟🌟')
+        ? readSpinner.succeed(
+            '🌟🌟 [ 🧙 hermes ] read files successfully! 🌟🌟',
+          )
         : readSpinner.warn('🤔🤔 [ 🧙 hermes ] read no files! 🤔🤔');
       return fileResults;
     } catch (error) {

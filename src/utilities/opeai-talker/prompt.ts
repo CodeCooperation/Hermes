@@ -1,8 +1,9 @@
 import fs from 'fs';
-import { userOptions } from 'src/constant';
-import { HermesTypeEnum, IReadFileResult } from 'src/types';
-import { ExtractCodePrompts } from 'src/utils/extract-code-prompts';
-import { readPromptFile } from 'src/utils/read-prompt-file';
+import { userOptions } from 'src/utilities/constant';
+import { readPromptFile } from 'src/utilities/reader/read-prompt-file';
+
+import { ExtractCodePrompts } from '../extractor/extract-code-prompts';
+import { HermesTypeEnum, IReadFileResult } from '../types';
 
 export class HermesPrompt {
   private hermesTypeMap: Record<
@@ -14,8 +15,6 @@ export class HermesPrompt {
         fileResult.fileContent ||
         fs.readFileSync(fileResult.filePath!, 'utf-8');
       const testsPrompt = readPromptFile('tests.txt');
-      // const fileName = getFileNameByPath(fileResult.filePath!)
-      // - Import the test function from "../${fileName}".
       const basePrompt = `
         ${testsPrompt}
         ${userOptions.openAIPrompt || ''}

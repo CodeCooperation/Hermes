@@ -2,21 +2,17 @@ import generate from '@babel/generator';
 import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import fs from 'fs';
-import { userOptions } from 'src/constant';
-import { IReadFileResult } from 'src/types';
+import { userOptions } from 'src/utilities/constant';
+
+import { IReadFileResult } from '../types';
 
 const traverseFunc =
   typeof traverse === 'function' ? traverse : (traverse as any).default;
 const generateFunc =
   typeof generate === 'function' ? generate : (generate as any).default;
 
-/**
- * Pick function or class code from the given code
- */
 export class ExtractCodePrompts {
-  // Store the remaining code after picking
   private remainingCode: string[];
-  // Store the end index of the remaining code
   private remainingEndIndex;
 
   constructor() {
@@ -24,9 +20,6 @@ export class ExtractCodePrompts {
     this.remainingEndIndex = 0;
   }
 
-  /**
-   * Check if the node is a function or class
-   */
   private isFunctionOrClass(nodePath: NodePath | null): boolean {
     if (!nodePath) return true;
 
@@ -46,9 +39,6 @@ export class ExtractCodePrompts {
     );
   }
 
-  /**
-   * Pick function or class code from the given code
-   */
   public extractFunctionOrClassCodeArray({
     fileContent,
     filePath,
@@ -61,13 +51,11 @@ export class ExtractCodePrompts {
 
       traverseFunc(ast, {
         enter: (nodePath) => {
-          // If current node already in the remaining code, skip it
           if (Number(nodePath.node.start) < this.remainingEndIndex) return;
 
           if (!this.isFunctionOrClass(nodePath)) return;
 
           this.remainingEndIndex = Number(nodePath.node.end);
-          // If the current node is a function or class, generate the code snippet
           const codeSnippet = generateFunc(nodePath.node).code;
           this.remainingCode.push(codeSnippet);
         },

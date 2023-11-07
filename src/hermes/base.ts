@@ -1,14 +1,10 @@
-import { ChatgptProxyAPI } from 'src/chatgpt';
-import { IReadFileResult } from 'src/types';
+import { ChatgptProxyAPI } from 'src/utilities/opeai-talker';
+import { IReadFileResult } from 'src/utilities/types';
 
-/**
- * Base class for Hermes
- */
 abstract class HermesBase {
   public openai: ChatgptProxyAPI;
 
   constructor() {
-    // Create a new OpenAI API client
     this.openai = new ChatgptProxyAPI();
   }
 
