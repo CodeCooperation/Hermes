@@ -3,6 +3,7 @@ import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import fs from 'fs';
 import { userOptions } from 'src/utilities/constant';
+
 import { IReadFileResult } from '../types';
 
 const traverseFunc =

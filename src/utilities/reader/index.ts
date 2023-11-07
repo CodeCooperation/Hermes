@@ -3,9 +3,9 @@ import ora from 'ora';
 import path from 'path';
 import { userOptions } from 'src/utilities/constant';
 
+import { IReadFileResult, ReadTypeEnum } from '../types';
 import ReadTestFilePathsByDirectory from './reader-directory';
 import StagedFileReader from './reader-git-stage';
-import { IReadFileResult, ReadTypeEnum } from '../types';
 
 class ReadFiles {
   private dirPath: string;
