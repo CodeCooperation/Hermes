@@ -620,7 +620,7 @@ var ChatgptProxyAPI = class {
     }
     return msgArray;
   }
-  resetParentMsg() {
+  resetParentMessage() {
     this.parentMsg = void 0;
   }
   async run(fileRes) {
